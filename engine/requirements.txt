@@ -11,3 +11,5 @@ sherpa_onnx
 requests
 openai
 jaraco.functools
+jaraco.text
+platformdirs
