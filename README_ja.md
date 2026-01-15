@@ -66,7 +66,8 @@ macOS および Linux プラットフォームでシステムオーディオ出�
 |                                                              | 正確性 | 実時間性 | デプロイタイプ | 対応言語 | 翻訳 | 備考 |
 | ------------------------------------------------------------ | -------- | --------- | -------------- | -------- | ---- | ---- |
 | [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | とても良い😊 | とても良い😊 | クラウド / アリババクラウド | 10言語 | 内蔵翻訳 | 有料、0.54元/時間 |
-| [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | とても良い😊 | 悪い😞 | クラウド / Zhipu AI | 4言語 | 追加設定が必要 | 有料、約0.72元/時間 |
+| [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | 很好😊 | 较差😞 | クラウド / Zhipu AI | 中国語、広東語、英語、日本語、フランス語、ドイツ語、韓国語、スペイン語のパラメータ指定はサポートされていません | 追加設定が必要 | 有料、約0.72元/時間 |
+| [FunAudioLLM/SenseVoiceSmall](https://github.com/FunAudioLLM/SenseVoice/blob/main/README_zh.md) | とても良い😊 | とても良い😊 | クラウド / Siliconflow | 中・粤・英・日・韓語、引数指定の伝送をサポートしていません | Zhipu 查AIと同じ呼び出し方法を使用し、URLを以下のように修正してください：https://api.siliconflow.cn/v1/audio/transcriptions，Model：FunAudioLLM/SenseVoiceSmall | Free |
 | [Vosk](https://alphacephei.com/vosk) | 悪い😞 | とても良い😊 | ローカル / CPU | 30言語以上 | 追加設定が必要 | 多くの言語に対応 |
 | [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | 普通😐 | 普通😐 | ローカル / CPU | 5言語 | 追加設定が必要 | 1つのモデルのみ |
 | 自分で開発 | 🤔 | 🤔 | カスタム | カスタム | カスタム | [ドキュメント](./docs/engine-manual/ja.md)に従ってPythonを使用して自分で開発 |
@@ -93,6 +94,7 @@ Gummyモデル以外を選択した場合、独自の翻訳モデルを設定す
 - OpenAI: https://api.openai.com/v1
 - DeepSeek: https://api.deepseek.com
 - アリババクラウド: https://dashscope.aliyuncs.com/compatible-mode/v1
+- Siliconflow: https://api.siliconflow.cn（Model：tencent/Hunyuan-MT-7B, Free）
 
 API Keyは対応するモデルプロバイダから取得する必要があります。
 
@@ -205,6 +207,16 @@ npm install
 
 ### 字幕エンジンの構築
 
+#### ワンクリックビルド
+
+```bash
+npm run build:engine
+```
+
+実際の状況に応じて環境を選択してください。
+
+#### 手動ビルド
+
 まず `engine` フォルダに入り、以下のコマンドを実行して仮想環境を作成します（Python 3.10 以上が必要で、Python 3.12 が推奨されます）：
 
 ```bash
@@ -225,6 +237,14 @@ source .venv/bin/activate
 ```
 
 次に依存関係をインストールします（このステップでは macOS と Linux でエラーが発生する可能性があります。通常はビルド失敗によるもので、エラーメッセージに基づいて対処する必要があります）：
+
+> **macOS ユーザーへの注意**:
+> 1. 依存関係をインストールする前に `portaudio` ライブラリをインストールする必要があります。そうしないと `pyaudio` のビルドに失敗します。
+>    Homebrew を使用してインストールしてください：
+>    ```bash
+>    brew install portaudio
+>    ```
+> 2. `llvmlite` 関連のエラーが発生した場合は、Python 3.10 - 3.12 バージョンを使用していることを確認してください。Python 3.13 では、コンパイル済みの wheel パッケージが不足しているため、ビルドに失敗する可能性があります。
 
 ```bash
 pip install -r requirements.txt

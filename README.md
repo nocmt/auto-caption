@@ -64,7 +64,8 @@ macOS 平台和 Linux 平台获取系统音频输出需要进行额外设置，�
 |                                                              | 准确率 | 实时性 | 部署类型          | 支持语言   | 翻译       | 备注                                                       |
 | ------------------------------------------------------------ | -------- | ------------- | ---------- | ---------- | ---------------------------------------------------------- | ---------------------------------------------------------- |
 | [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | 很好😊    | 很好😊 | 云端 / 阿里云 | 10 种      | 自带翻译   | 收费，0.54CNY / 小时                                       |
-| [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | 很好😊 | 较差😞 | 云端 / 智谱 AI | 4 种 | 需额外配置 | 收费，约 0.72CNY / 小时 |
+| [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | 很好😊 | 较差😞 | 云端 / 智谱 AI | 中、粤、英、日、法、德、韩、西班牙语，不支持传参指定 | 需额外配置 | 收费，约 0.72CNY / 小时 |
+| [FunAudioLLM/SenseVoiceSmall](https://github.com/FunAudioLLM/SenseVoice/blob/main/README_zh.md) | 很好😊 | 很好😊 | 云端 / 硅基流动 | 中、粤、英、日、韩语，不支持传参指定 | 需额外配置，使用和智谱 AI一样的调用方式，修改URL为：https://api.siliconflow.cn/v1/audio/transcriptions，模型名称修改为：FunAudioLLM/SenseVoiceSmall | 免费 |
 | [Vosk](https://alphacephei.com/vosk)                         | 较差😞    | 很好😊 | 本地 / CPU    | 超过 30 种 | 需额外配置 | 支持的语言非常多                                           |
 | [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | 一般😐    | 一般😐 | 本地 / CPU    | 5 种       | 需额外配置 | 仅有一个模型                                               |
 | 自己开发                                                     | 🤔        | 🤔      | 自定义        | 自定义     | 自定义     | 根据[文档](./docs/engine-manual/zh.md)使用 Python 自己开发 |
@@ -91,6 +92,7 @@ macOS 平台和 Linux 平台获取系统音频输出需要进行额外设置，�
 - OpenAI: https://api.openai.com/v1
 - DeepSeek：https://api.deepseek.com
 - 阿里云：https://dashscope.aliyuncs.com/compatible-mode/v1
+- 硅基流动：https://api.siliconflow.cn（模型名称用：tencent/Hunyuan-MT-7B，免费）
 
 API Key 需要在对应的模型提供商处获取。
 
@@ -204,6 +206,17 @@ npm install
 
 ### 构建字幕引擎
 
+#### 一键构建
+
+```bash
+npm run build:engine
+```
+
+根据实际情况选择环境。
+
+#### 手动构建
+
+
 首先进入 `engine` 文件夹，执行如下指令创建虚拟环境（需要使用大于等于 Python 3.10 的 Python 运行环境，建议使用 Python 3.12）：
 
 ```bash
@@ -224,6 +237,14 @@ source .venv/bin/activate
 ```
 
 然后安装依赖（这一步在 macOS 和 Linux 可能会报错，一般是因为构建失败，需要根据报错信息进行处理）：
+
+> **macOS 用户注意**：
+> 1. 安装依赖前需要先安装 `portaudio` 库，否则 `pyaudio` 会构建失败。
+>    请使用 Homebrew 安装：
+>    ```bash
+>    brew install portaudio
+>    ```
+> 2. 如果遇到 `llvmlite` 相关错误，请确保使用 Python 3.10 - 3.12 版本。Python 3.13 可能因为缺少预编译的 wheel 包导致构建失败。
 
 ```bash
 pip install -r requirements.txt

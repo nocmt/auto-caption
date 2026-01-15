@@ -65,7 +65,8 @@ After downloading the software, you need to select the corresponding model accor
 |                                                              | Accuracy | Real-time | Deployment Type | Supported Languages | Translation | Notes |
 | ------------------------------------------------------------ | -------- | --------- | --------------- | ------------------- | ----------- | ----- |
 | [Gummy](https://help.aliyun.com/zh/model-studio/gummy-speech-recognition-translation) | Very good 😊 | Very good 😊 | Cloud / Alibaba Cloud | 10 languages | Built-in translation | Paid, 0.54 CNY/hour |
-| [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | Very good 😊 | Poor 😞 | Cloud / Zhipu AI | 4 languages | Requires additional configuration | Paid, approximately 0.72 CNY/hour |
+| [glm-asr-2512](https://docs.bigmodel.cn/cn/guide/models/sound-and-video/glm-asr-2512) | Very good😊 | Poor😞 | Cloud / Zhipu AI | Chinese, Cantonese, English, Japanese, French, German, Korean, Spanish, parameter specification is not supported | Additional configuration required | Paid, approximately 0.72 CNY/hour |
+| [FunAudioLLM/SenseVoiceSmall](https://github.com/FunAudioLLM/SenseVoice/blob/main/README_zh.md) | Very good😊 | Very good😊 | Cloud / Siliconflow  | Chinese, Cantonese, English, Japanese, and Korean are not supported for parameter specification. | Additional configuration is required. Use the same calling method as Zhipu AI, and modify the URL to: https://api.siliconflow.cn/v1/audio/transcriptions, The model name is modified to: FunAudioLLM/SenseVoiceSmall | Free |
 | [Vosk](https://alphacephei.com/vosk) | Poor 😞 | Very good 😊 | Local / CPU | Over 30 languages | Requires additional configuration | Supports many languages |
 | [SOSV](https://k2-fsa.github.io/sherpa/onnx/sense-voice/index.html) | Average 😐 | Average 😐 | Local / CPU | 5 languages | Requires additional configuration | Only one model |
 | Self-developed | 🤔 | 🤔 | Custom | Custom | Custom | Develop your own using Python according to the [documentation](./docs/engine-manual/en.md) |
@@ -92,6 +93,7 @@ Here are some model provider `Base URL`s:
 - OpenAI: https://api.openai.com/v1
 - DeepSeek: https://api.deepseek.com
 - Alibaba Cloud: https://dashscope.aliyuncs.com/compatible-mode/v1
+- Siliconflow: https://api.siliconflow.cn（Model：tencent/Hunyuan-MT-7B, Free）
 
 The API Key needs to be obtained from the corresponding model provider.
 
@@ -204,6 +206,16 @@ npm install
 
 ### Build Subtitle Engine
 
+#### One-click Build
+
+```bash
+npm run build:engine
+```
+
+Select the environment according to the actual situation.
+
+#### Manual Build
+
 First enter the `engine` folder and execute the following commands to create a virtual environment (requires Python 3.10 or higher, with Python 3.12 recommended):
 
 ```bash
@@ -224,6 +236,14 @@ source .venv/bin/activate
 ```
 
 Then install dependencies (this step might result in errors on macOS and Linux, usually due to build failures, and you need to handle them based on the error messages):
+
+> **Note for macOS users**:
+> 1. You need to install the `portaudio` library before installing dependencies, otherwise `pyaudio` build will fail.
+>    Please install using Homebrew:
+>    ```bash
+>    brew install portaudio
+>    ```
+> 2. If you encounter errors related to `llvmlite`, please ensure you are using Python 3.10 - 3.12. Python 3.13 might fail to build due to missing pre-compiled wheel packages.
 
 ```bash
 pip install -r requirements.txt
