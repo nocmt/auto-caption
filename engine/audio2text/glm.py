@@ -5,6 +5,7 @@ import struct
 import math
 import audioop
 import requests
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
 from utils import shared_data
@@ -157,18 +158,15 @@ class GlmRecognizer:
         
         if self.target:
              if self.trans_func == ollama_translate:
-                 th = threading.Thread(
-                    target=self.trans_func,
-                    args=(self.ollama_name, self.target, caption['text'], time_s, self.ollama_url, self.ollama_api_key),
-                    daemon=True
+                 self.trans_executor.submit(
+                    self.trans_func,
+                    self.ollama_name, self.target, caption['text'], time_s, self.ollama_url, self.ollama_api_key
                 )
              else:
-                 th = threading.Thread(
-                    target=self.trans_func,
-                    args=(self.ollama_name, self.target, caption['text'], time_s),
-                    daemon=True
+                 self.trans_executor.submit(
+                    self.trans_func,
+                    self.ollama_name, self.target, caption['text'], time_s
                 )
-             th.start()
         
         stdout_obj(caption)
 
