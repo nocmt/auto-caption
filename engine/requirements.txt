@@ -10,3 +10,4 @@ ollama
 sherpa_onnx
 requests
 openai
+jaraco.functools
