@@ -61,7 +61,7 @@ export class CaptionEngine {
           this.appPath = path.join(process.resourcesPath, 'engine', 'main.exe')
         }
         else {
-          this.appPath = path.join(process.resourcesPath, 'engine', 'main', 'main')
+          this.appPath = path.join(process.resourcesPath, 'engine', 'main')
         }
       }
       this.command.push('-a', allConfig.controls.audio ? '1' : '0')
