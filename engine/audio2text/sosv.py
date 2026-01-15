@@ -8,7 +8,6 @@ https://github.com/k2-fsa/sherpa-onnx/blob/master/python-api-examples/simulate-s
 
 import time
 from datetime import datetime
-import sherpa_onnx
 import threading
 import numpy as np
 
@@ -53,6 +52,7 @@ class SosvRecognizer:
 
     def start(self):
         """启动 Sense Voice 模型"""
+        import sherpa_onnx
         self.recognizer = sherpa_onnx.OfflineRecognizer.from_sense_voice(
             model=f"{self.model_path}/sensevoice/model{self.ext}.onnx",
             tokens=f"{self.model_path}/sensevoice/tokens.txt",

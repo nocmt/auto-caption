@@ -1,10 +1,10 @@
 """获取 MacOS 系统音频输入/输出流"""
 
-import pyaudio
+import sys
 from textwrap import dedent
 
 
-def get_blackhole_device(mic: pyaudio.PyAudio):
+def get_blackhole_device(mic):
     """
     获取 BlackHole 设备
     """
@@ -25,6 +25,7 @@ class AudioStream:
         chunk_rate: 每秒采集音频块的数量，默认为10
     """
     def __init__(self, audio_type=0, chunk_rate=10):
+        import pyaudio
         self.audio_type = audio_type
         self.mic = pyaudio.PyAudio()
         if self.audio_type == 0:

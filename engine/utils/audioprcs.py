@@ -1,6 +1,5 @@
-import resampy
-import numpy as np
-import numpy.core.multiarray # do not remove
+# import numpy as np
+# import numpy.core.multiarray # do not remove
 
 def merge_chunk_channels(chunk: bytes, channels: int) -> bytes:
     """
@@ -14,6 +13,8 @@ def merge_chunk_channels(chunk: bytes, channels: int) -> bytes:
         单通道音频数据块
     """
     if channels == 1: return chunk
+    
+    import numpy as np
     # (length * channels,)
     chunk_np = np.frombuffer(chunk, dtype=np.int16)
     # (length, channels)
@@ -38,9 +39,11 @@ def resample_chunk_mono(chunk: bytes, channels: int, orig_sr: int, target_sr: in
         单通道音频数据块
     """
     if channels == 1:
+        import numpy as np
         chunk_mono = np.frombuffer(chunk, dtype=np.int16)
         chunk_mono = chunk_mono.astype(np.float32)
     else:
+        import numpy as np
         # (length * channels,)
         chunk_np = np.frombuffer(chunk, dtype=np.int16)
         # (length, channels)
@@ -51,6 +54,7 @@ def resample_chunk_mono(chunk: bytes, channels: int, orig_sr: int, target_sr: in
     if orig_sr == target_sr:
         return chunk_mono.astype(np.int16).tobytes()
     
+    import resampy
     chunk_mono_r = resampy.resample(chunk_mono, orig_sr, target_sr)
     chunk_mono_r = np.round(chunk_mono_r).astype(np.int16)
     real_len = round(chunk_mono.shape[0] * target_sr / orig_sr)

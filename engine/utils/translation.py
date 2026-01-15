@@ -1,11 +1,3 @@
-from ollama import chat, Client
-from ollama import ChatResponse
-try:
-    from openai import OpenAI
-except ImportError:
-    OpenAI = None
-import asyncio
-from googletrans import Translator
 from .sysout import stdout_cmd, stdout_obj
 
 lang_map = {
@@ -22,6 +14,17 @@ lang_map = {
 }
 
 def ollama_translate(model: str, target: str, text: str, time_s: str, url: str = '', key: str = ''):
+    try:
+        from ollama import chat, Client
+        from ollama import ChatResponse
+        try:
+            from openai import OpenAI
+        except ImportError:
+            OpenAI = None
+    except ImportError as e:
+        stdout_cmd("warn", f"Ollama/OpenAI import failed: {str(e)}")
+        return
+
     content = ""
     try:
         if url:
@@ -70,6 +73,8 @@ def ollama_translate(model: str, target: str, text: str, time_s: str, url: str =
     })
 
 def google_translate(model: str, target: str, text: str, time_s: str):
+    import asyncio
+    from googletrans import Translator
     translator = Translator()
     try:
         res = asyncio.run(translator.translate(text, dest=target))

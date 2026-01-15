@@ -4,16 +4,17 @@ import threading
 import datetime
 from utils import stdout, stdout_cmd, change_caption_display
 from utils import shared_data, start_server
-from utils import merge_chunk_channels, resample_chunk_mono
-from audio2text import GummyRecognizer
-from audio2text import VoskRecognizer
-from audio2text import SosvRecognizer
-from audio2text import GlmRecognizer
+# from utils import merge_chunk_channels, resample_chunk_mono
+# from audio2text import GummyRecognizer
+# from audio2text import VoskRecognizer
+# from audio2text import SosvRecognizer
+# from audio2text import GlmRecognizer
 from sysaudio import AudioStream
 
 
 def audio_recording(stream: AudioStream, resample: bool, record = False, path = ''):
     global shared_data
+    from utils import merge_chunk_channels, resample_chunk_mono
     stream.open_stream()
     wf = None
     full_name = ''
@@ -56,6 +57,7 @@ def main_gummy(s: str, t: str, a: int, c: int, k: str, r: bool, rp: str):
         rp: Path to save the recorded audio
     """
     stream = AudioStream(a, c)
+    from audio2text import GummyRecognizer
     if t == 'none':
         engine = GummyRecognizer(stream.RATE, s, None, k)
     else:
@@ -90,6 +92,7 @@ def main_vosk(a: int, c: int, vosk: str, t: str, tm: str, omn: str, ourl: str, o
         rp: Path to save the recorded audio
     """
     stream = AudioStream(a, c)
+    from audio2text import VoskRecognizer
     if t == 'none':
         engine = VoskRecognizer(vosk, None, tm, omn, ourl, okey)
     else:
@@ -125,6 +128,7 @@ def main_sosv(a: int, c: int, sosv: str, s: str, t: str, tm: str, omn: str, ourl
         rp: Path to save the recorded audio
     """
     stream = AudioStream(a, c)
+    from audio2text import SosvRecognizer
     if t == 'none':
         engine = SosvRecognizer(sosv, s, None, tm, omn, ourl, okey)
     else:
@@ -162,10 +166,11 @@ def main_glm(a: int, c: int, url: str, model: str, key: str, s: str, t: str, tm:
         rp: Record path
     """
     stream = AudioStream(a, c)
+    from audio2text import GlmRecognizer
     if t == 'none':
-        engine = GlmRecognizer(url, model, key, s, None, tm, omn, ourl, okey)
+        engine = GlmRecognizer(url, model, key, s, None, tm, omn, ourl, okey, c)
     else:
-        engine = GlmRecognizer(url, model, key, s, t, tm, omn, ourl, okey)
+        engine = GlmRecognizer(url, model, key, s, t, tm, omn, ourl, okey, c)
     
     engine.start()
     stream_thread = threading.Thread(
@@ -183,6 +188,10 @@ def main_glm(a: int, c: int, url: str, model: str, key: str, s: str, t: str, tm:
 
 
 if __name__ == "__main__":
+    t_start = datetime.datetime.now()
+    from utils import stdout_cmd
+    stdout_cmd('info', f'Process start: {t_start}')
+
     parser = argparse.ArgumentParser(description='Convert system audio stream to text')
     # all
     parser.add_argument('-e', '--caption_engine', default='gummy', help='Caption engine: gummy, glm, vosk or sosv')
@@ -215,11 +224,13 @@ if __name__ == "__main__":
 
     if args.port != 0:
         threading.Thread(target=start_server, args=(args.port,), daemon=True).start()
+        stdout_cmd('info', f'Socket server thread started on port {args.port}. Time: {datetime.datetime.now() - t_start}')
 
     if args.display_caption == '1':
         change_caption_display(True)
 
     if args.caption_engine == 'gummy':
+        stdout_cmd('info', f'Initializing Gummy engine... Time: {datetime.datetime.now() - t_start}')
         main_gummy(
             args.source_language,
             args.target_language,
@@ -230,6 +241,7 @@ if __name__ == "__main__":
             args.record_path
         )
     elif args.caption_engine == 'vosk':
+        stdout_cmd('info', f'Initializing Vosk engine... Time: {datetime.datetime.now() - t_start}')
         main_vosk(
             int(args.audio_type),
             int(args.chunk_rate),
@@ -243,6 +255,7 @@ if __name__ == "__main__":
             args.record_path
         )
     elif args.caption_engine == 'sosv':
+        stdout_cmd('info', f'Initializing SOSV engine... Time: {datetime.datetime.now() - t_start}')
         main_sosv(
             int(args.audio_type),
             int(args.chunk_rate),
@@ -257,6 +270,7 @@ if __name__ == "__main__":
             args.record_path
         )
     elif args.caption_engine == 'glm':
+        stdout_cmd('info', f'Initializing GLM engine... Time: {datetime.datetime.now() - t_start}')
         main_glm(
             int(args.audio_type),
             int(args.chunk_rate),

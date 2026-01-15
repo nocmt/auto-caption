@@ -3,8 +3,6 @@ import threading
 import time
 from datetime import datetime
 
-from vosk import Model, KaldiRecognizer, SetLogLevel
-from utils import shared_data
 from utils import stdout_cmd, stdout_obj, google_translate, ollama_translate
 
 
@@ -19,6 +17,7 @@ class VoskRecognizer:
         ollama_name: Ollama 模型名称
     """
     def __init__(self, model_path: str, target: str | None, trans_model: str, ollama_name: str, ollama_url: str = '', ollama_api_key: str = ''):
+        from vosk import Model, KaldiRecognizer, SetLogLevel
         SetLogLevel(-1)
         if model_path.startswith('"'):
             model_path = model_path[1:]

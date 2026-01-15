@@ -47,13 +47,16 @@ class GlmRecognizer:
         # VAD settings (假设 16k 16bit, chunk size 1024 or similar)
         # 16bit = 2 bytes per sample.
         # RMS threshold needs tuning. 500 is a conservative guess for silence.
-        self.threshold = 500 
-        self.silence_limit = 15 # frames (approx 0.5-1s depending on chunk size)
-        self.min_speech_frames = 10 # frames
+        self.threshold = 300 
+        self.silence_limit = 5 # frames (approx 0.5s)
+        self.min_speech_frames = 3 # frames (approx 0.3s)
+        self.debug_frame_count = 0
 
     def start(self):
         """启动 GLM 引擎"""
         stdout_cmd('info', 'GLM-ASR recognizer started.')
+        stdout_cmd('info', f'VAD settings: threshold={self.threshold}, silence_limit={self.silence_limit}')
+        stdout_cmd('connect')
 
     def stop(self):
         """停止 GLM 引擎"""
@@ -63,6 +66,10 @@ class GlmRecognizer:
         # chunk is bytes (int16)
         rms = audioop.rms(chunk, 2)
         
+        self.debug_frame_count += 1
+        if self.debug_frame_count % 100 == 0:
+             stdout_cmd('info', f'Current RMS: {rms} (Threshold: {self.threshold})')
+
         if rms > self.threshold:
             if not self.is_speech:
                 self.is_speech = True
@@ -81,6 +88,14 @@ class GlmRecognizer:
                     self.is_speech = False
                     self.audio_buffer = []
                     self.silence_frames = 0
+        
+        # Check max duration
+        if self.is_speech and len(self.audio_buffer) >= self.max_speech_frames:
+            stdout_cmd('info', 'Max speech duration reached (6s), forced recognition.')
+            self.recognize(self.audio_buffer, self.time_str)
+            self.is_speech = False
+            self.audio_buffer = []
+            self.silence_frames = 0
     
     def recognize(self, audio_frames, time_s):
         audio_bytes = b''.join(audio_frames)

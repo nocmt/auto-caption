@@ -63,7 +63,7 @@ const defaultControls: Controls = {
   customized: false,
   customizedApp: '',
   customizedCommand: '',
-  startTimeoutSeconds: 30
+  startTimeoutSeconds: 60
 };
 
 

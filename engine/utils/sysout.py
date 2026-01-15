@@ -1,10 +1,9 @@
 import sys
 import json
-import sherpa_onnx
 
 display_caption = False
 caption_index = -1
-display = sherpa_onnx.Display()
+display = None
 
 def stdout(text: str):
     stdout_cmd("print", text)
@@ -19,12 +18,23 @@ def stdout_cmd(command: str, content = ""):
 
 def change_caption_display(val: bool):
     global display_caption
+    global display
     display_caption = val
+    if display_caption and display is None:
+        try:
+            import sherpa_onnx
+            display = sherpa_onnx.Display()
+        except ImportError:
+            stdout_cmd("warn", "sherpa_onnx not found, caption display disabled.")
+            display_caption = False
 
 def caption_display(obj):
     global display_caption
     global caption_index
     global display
+
+    if not display:
+        return
 
     if caption_index >=0 and caption_index != int(obj['index']):
         display.finalize_current_sentence()

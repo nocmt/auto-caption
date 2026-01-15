@@ -1,21 +1,17 @@
-from dashscope.audio.asr import (
-    TranslationRecognizerCallback,
-    TranscriptionResult,
-    TranslationResult,
-    TranslationRecognizerRealtime
-)
-import dashscope
-from dashscope.common.error import InvalidParameter
+import json
+import threading
 from datetime import datetime
+
 from utils import stdout_cmd, stdout_obj, stdout_err
 from utils import shared_data
 
-class Callback(TranslationRecognizerCallback):
+class Callback:
     """
     语音大模型流式传输回调对象
     """
-    def __init__(self):
-        super().__init__()
+    def __init__(self, callback_class):
+        self.callback_class = callback_class
+        self.instance = callback_class()
         self.index = 0
         self.usage = 0
         self.cur_id = -1
@@ -34,8 +30,8 @@ class Callback(TranslationRecognizerCallback):
     def on_event(
         self,
         request_id,
-        transcription_result: TranscriptionResult,
-        translation_result: TranslationResult,
+        transcription_result,
+        translation_result,
         usage
     ) -> None:
         caption = {}
@@ -74,8 +70,32 @@ class GummyRecognizer:
         api_key: 阿里云百炼平台 API KEY
     """
     def __init__(self, rate: int, source: str, target: str | None, api_key: str | None):
+        import dashscope
+        from dashscope.audio.asr import (
+            TranslationRecognizerCallback,
+            TranslationResult,
+            TranslationRecognizerRealtime
+        )
         if api_key:
             dashscope.api_key = api_key
+        
+        class MyCallback(TranslationRecognizerCallback):
+            def __init__(self, parent_callback):
+                super().__init__()
+                self.parent = parent_callback
+            
+            def on_open(self) -> None:
+                self.parent.on_open()
+                
+            def on_close(self) -> None:
+                self.parent.on_close()
+                
+            def on_event(self, request_id, transcription_result, translation_result, usage) -> None:
+                self.parent.on_event(request_id, transcription_result, translation_result, usage)
+
+        self.callback_handler = Callback(TranslationRecognizerCallback)
+        self.real_callback = MyCallback(self.callback_handler)
+
         self.translator = TranslationRecognizerRealtime(
             model = "gummy-realtime-v1",
             format = "pcm",
@@ -84,7 +104,7 @@ class GummyRecognizer:
             translation_enabled = (target is not None),
             source_language = source,
             translation_target_languages = [target],
-            callback = Callback()
+            callback = self.real_callback
         )
 
     def start(self):
@@ -94,6 +114,7 @@ class GummyRecognizer:
     def translate(self):
         """持续读取共享数据中的音频帧，并进行语音识别，将识别结果输出到标准输出中"""
         global shared_data
+        from dashscope.common.error import InvalidParameter
         restart_count = 0
         while shared_data.status == 'running':
             chunk = shared_data.chunk_queue.get()

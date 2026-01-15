@@ -35,27 +35,28 @@ export class CaptionEngine {
         return false
       }
       this.command = []
-      if (is.dev) {
-        if(process.platform === "win32") {
-          this.appPath = path.join(
-            app.getAppPath(), 'engine',
-            '.venv', 'Scripts', 'python.exe'
-          )
-          this.command.push(path.join(
-            app.getAppPath(), 'engine', 'main.py'
-          ))
-          // this.appPath = path.join(app.getAppPath(), 'engine', 'dist', 'main.exe')
-        }
-        else {
-          this.appPath = path.join(
-            app.getAppPath(), 'engine',
-            '.venv', 'bin', 'python3'
-          )
-          this.command.push(path.join(
-            app.getAppPath(), 'engine', 'main.py'
-          ))
-        }
+    if (is.dev) {
+      if(process.platform === "win32") {
+        this.appPath = path.join(
+          app.getAppPath(), 'engine',
+          '.venv', 'Scripts', 'python.exe'
+        )
+        this.command.push('-u')
+        this.command.push(path.join(
+          app.getAppPath(), 'engine', 'main.py'
+        ))
       }
+      else {
+        this.appPath = path.join(
+          app.getAppPath(), 'engine',
+          '.venv', 'bin', 'python3'
+        )
+        this.command.push('-u')
+        this.command.push(path.join(
+          app.getAppPath(), 'engine', 'main.py'
+        ))
+      }
+    }
       else {
         if(process.platform === 'win32') {
           this.appPath = path.join(process.resourcesPath, 'engine', 'main.exe')
