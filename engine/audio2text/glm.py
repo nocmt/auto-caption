@@ -50,6 +50,7 @@ class GlmRecognizer:
         self.threshold = 300 
         self.silence_limit = 5 # frames (approx 0.5s)
         self.min_speech_frames = 3 # frames (approx 0.3s)
+        self.max_speech_frames = chunk_rate * 6 # Max 6 seconds
         self.debug_frame_count = 0
 
     def start(self):
